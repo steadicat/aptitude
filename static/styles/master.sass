@@ -1,0 +1,57 @@
+
+$unit: 26px
+$code: #03c
+
+body
+  margin: $unit 10*$unit
+
+body, h1, h2, h3, h4
+  font:
+    size: $unit/2
+    family: verdana, sans-serif
+    weight: normal
+  line-height: $unit
+
+h1
+  font-size: 28px
+h2
+  font-size: 22px
+
+p
+  margin: $unit/4 0 0 0
+code
+  font-family: consolas, 'andale mono', inconsolata, monospace
+  background: lighten($code, 55%)
+  border: 1px solid lighten($code, 50%)
+  pre &
+    margin: $unit/2 0
+    padding: $unit/4 $unit/2
+
+.light
+  color: lighten(black, 50%)
+
+blockquote
+  @extend .light
+  margin: 0
+  font-style: italic
+
+ol, li
+  padding: 0
+  margin: 0
+
+li:before
+  @extend .light
+
+.loading
+  background: no-repeat center center
+  background-image: inline_image('/images/loading.gif')
+  *background-image: url(/images/loading.gif)
+
+a
+  text-decoration: none
+
+.selected
+  color: black
+  font-weight: bold
+  cursor: default
+
