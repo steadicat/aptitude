@@ -22,7 +22,7 @@ compile = () ->
         return console.log err if err
         for ext, handler of handlers
             if path.extname(file) == ext
-                console.log "Compiling #{file} using #{handler}"
+                console.log "Compiling #{file}"
                 handler file, (err, content) ->
                     return console.log err if err
                     fs.writeFile develop.stripExt(file) + extensions[ext], content

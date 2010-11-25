@@ -145,7 +145,7 @@ loadJs = (file, callback) ->
 
 coffee = try require 'coffee-script' catch e then no
 
-compileCoffee = (file, callback) ->
+@compileCoffee = compileCoffee = (file, callback) ->
     fs.readFile file, 'utf-8', err(callback) (content) ->
         try
             processRequires file, coffee.compile(content), callback
@@ -172,7 +172,7 @@ processRequires = (file, content, callback) ->
 # `compass` command. We then have to read from the CSS file it outputs
 # to disk.
 
-compileSass = (file, callback) ->
+@compileSass = compileSass = (file, callback) ->
     dir = path.dirname file
     target = "#{dir}/#{path.basename(file, '.sass')}.css"
     exec "compass compile --sass-dir #{dir} --css-dir #{dir} --images-dir #{STATIC} -s compressed --relative-assets #{file}", '', '.', err(callback) (output) ->
@@ -190,7 +190,7 @@ compileSass = (file, callback) ->
 
 haml = try require 'hamljs' catch e then no
 
-compileHaml = (file, callback) ->
+@compileHaml = compileHaml = (file, callback) ->
     dir = path.dirname file
     target = "#{dir}/#{path.basename(file, '.haml')}.html"
     fs.readFile file, 'utf-8', err(callback) (content) ->
@@ -269,7 +269,7 @@ toList = (f) ->
 # Remove the extension from the file name, while keeping the directory
 # structure. Optionally specify which extension to remove (`ext`).
 
-stripExt = (file, ext) ->
+@stripExt = stripExt = (file, ext) ->
     ext or = path.extname(file)
     path.join path.dirname(file), path.basename(file, ext)
 
@@ -328,6 +328,7 @@ exec = (command, input, cwd, callback) ->
 
 ### Start ###
 
-http = require 'http'
-http.createServer(server).listen(PORT)
-log "Tamper server listening on http://localhost:#{PORT}/"
+if not module.parent
+    http = require 'http'
+    http.createServer(server).listen(PORT)
+    log "Tamper server listening on http://localhost:#{PORT}/"
