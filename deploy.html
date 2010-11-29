@@ -1,1 +1,80 @@
-docs/deploy.html
+<!DOCTYPE html>  <html> <head>   <title>deploy.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="deploy.html">                 deploy.coffee               </a>                                           <a class="source" href="develop.html">                 develop.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               deploy.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">STATIC</span> <span class="o">=</span> <span class="s1">&#39;static&#39;</span>
+
+<span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span> <span class="s1">&#39;fs&#39;</span>
+<span class="nx">sys</span> <span class="o">=</span> <span class="nx">require</span> <span class="s1">&#39;sys&#39;</span>
+<span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span> <span class="s1">&#39;path&#39;</span>
+<span class="nx">develop</span> <span class="o">=</span> <span class="nx">require</span> <span class="s1">&#39;./develop&#39;</span>
+
+<span class="nx">handlers</span> <span class="o">=</span>
+    <span class="s1">&#39;.coffee&#39;</span><span class="o">:</span> <span class="nx">develop</span><span class="p">.</span><span class="nx">compileCoffee</span>
+    <span class="s1">&#39;.haml&#39;</span><span class="o">:</span> <span class="nx">develop</span><span class="p">.</span><span class="nx">compileHaml</span>
+    <span class="s1">&#39;.sass&#39;</span><span class="o">:</span> <span class="nx">develop</span><span class="p">.</span><span class="nx">compileSass</span>
+
+<span class="nx">extensions</span> <span class="o">=</span>
+    <span class="s1">&#39;.coffee&#39;</span><span class="o">:</span> <span class="s1">&#39;.js&#39;</span>
+    <span class="s1">&#39;.haml&#39;</span><span class="o">:</span> <span class="s1">&#39;.html&#39;</span>
+    <span class="s1">&#39;.sass&#39;</span><span class="o">:</span> <span class="s1">&#39;.css&#39;</span>
+
+<span class="nx">compile</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="nx">walk</span> <span class="nx">STATIC</span><span class="p">,</span> <span class="nx">skipDots</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">file</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+        <span class="k">for</span> <span class="nx">ext</span><span class="p">,</span> <span class="nx">handler</span> <span class="k">of</span> <span class="nx">handlers</span>
+            <span class="k">if</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="o">==</span> <span class="nx">ext</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;Compiling #{file}&quot;</span>
+                <span class="nx">handler</span> <span class="nx">file</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">content</span><span class="p">)</span> <span class="o">-&gt;</span>
+                    <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+                    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span> <span class="nx">develop</span><span class="p">.</span><span class="nx">stripExt</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="o">+</span> <span class="nx">extensions</span><span class="p">[</span><span class="nx">ext</span><span class="p">],</span> <span class="nx">content</span>
+
+<span class="nx">minify</span> <span class="o">=</span> <span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="nx">sys</span><span class="p">.</span><span class="nx">puts</span> <span class="s1">&#39;&gt;&gt;&gt; Minifying JS...&#39;</span>
+    <span class="nx">minifyingJS</span> <span class="o">=</span> <span class="kc">yes</span>
+    <span class="nx">waiting</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nx">each</span> <span class="nx">JS</span><span class="p">,</span> <span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">dest</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="nx">waiting</span><span class="o">++</span>
+        <span class="nx">exec</span> <span class="s2">&quot;java -jar contrib/closure.jar --js #{dest} &gt; #{dest}.tmp &amp;&amp; mv #{dest}.tmp #{dest}&quot;</span><span class="p">,</span> <span class="p">()</span> <span class="o">-&gt;</span>
+            <span class="nx">waiting</span><span class="o">--</span>
+            <span class="k">if</span> <span class="o">not</span> <span class="nx">waiting</span>
+                <span class="nx">sys</span><span class="p">.</span><span class="nx">puts</span> <span class="s1">&#39;&gt;&gt;&gt; JS minified.&#39;</span>
+                <span class="nx">minifyingJS</span> <span class="o">=</span> <span class="kc">no</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h2>Helpers</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">each</span> <span class="o">=</span> <span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+
+<span class="nx">DIR</span> <span class="o">=</span> <span class="mi">16877</span>
+
+<span class="nx">isDir</span> <span class="o">=</span> <span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">stat</span> <span class="nx">p</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">stats</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="k">if</span> <span class="nx">err</span>
+            <span class="nx">callback</span> <span class="nx">err</span>
+        <span class="k">else</span>
+            <span class="nx">callback</span> <span class="kc">no</span><span class="p">,</span> <span class="nx">stats</span><span class="p">.</span><span class="nx">mode</span> <span class="o">==</span> <span class="nx">DIR</span>
+
+<span class="nx">walk</span> <span class="o">=</span> <span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">filters</span><span class="p">...,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span> <span class="nx">p</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">files</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="k">return</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">if</span> <span class="nx">err</span>
+        <span class="nx">files</span><span class="p">.</span><span class="nx">forEach</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="o">-&gt;</span>
+
+            <span class="nx">f</span> <span class="o">=</span> <span class="s2">&quot;#{p}/#{file}&quot;</span>
+            <span class="nx">isDir</span> <span class="nx">f</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">isIt</span><span class="p">)</span> <span class="o">-&gt;</span>
+                <span class="k">return</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">if</span> <span class="nx">err</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>filters</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">stop</span> <span class="o">=</span> <span class="kc">false</span>
+                <span class="nx">filters</span><span class="p">.</span><span class="nx">forEach</span> <span class="p">(</span><span class="nx">filter</span><span class="p">)</span> <span class="o">-&gt;</span>
+                    <span class="k">if</span> <span class="o">not</span> <span class="nx">stop</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">isIt</span><span class="p">)</span> <span class="k">then</span> <span class="nx">stop</span> <span class="o">=</span> <span class="kc">true</span>
+
+                <span class="k">if</span> <span class="nx">stop</span> <span class="k">then</span> <span class="k">return</span>
+
+                <span class="k">if</span> <span class="nx">isIt</span>
+                    <span class="nx">walk</span> <span class="nx">f</span><span class="p">,</span> <span class="nx">filters</span><span class="p">...,</span> <span class="nx">callback</span>
+                <span class="k">else</span>
+                    <span class="nx">callback</span> <span class="kc">no</span><span class="p">,</span> <span class="nx">f</span>
+
+<span class="nx">startsWith</span> <span class="o">=</span> <span class="p">(</span><span class="nx">str</span><span class="p">,</span> <span class="nx">sub</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">str</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sub</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">is</span> <span class="nx">sub</span>
+<span class="nx">endsWith</span> <span class="o">=</span> <span class="p">(</span><span class="nx">str</span><span class="p">,</span> <span class="nx">sub</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">str</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="nx">sub</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">is</span> <span class="nx">sub</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>walk filters</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">skipDots</span> <span class="o">=</span> <span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">isDir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">not</span> <span class="nx">startsWith</span> <span class="nx">file</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span>
+<span class="nx">extension</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ext</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">isDir</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="k">if</span> <span class="nx">isDir</span>
+            <span class="kc">yes</span>
+        <span class="k">else</span>
+            <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="o">is</span> <span class="nx">ext</span>
+
+<span class="nx">compile</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
