@@ -303,7 +303,7 @@ asyncReplace = (string, rule, f, callback) ->
 
 child_process = require 'child_process'
 
-exec = (command, input, cwd, callback) ->
+@exec = exec = (command, input, cwd, callback) ->
     if not callback
         [callback, cwd] = [cwd, undefined]
     if not callback

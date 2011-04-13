@@ -27,17 +27,8 @@ compile = () ->
                     return console.log err if err
                     fs.writeFile develop.stripExt(file) + extensions[ext], content
 
-minify = () ->
-    sys.puts '>>> Minifying JS...'
-    minifyingJS = yes
-    waiting = 0
-    each JS, (source, dest) ->
-        waiting++
-        exec "java -jar contrib/closure.jar --js #{dest} > #{dest}.tmp && mv #{dest}.tmp #{dest}", () ->
-            waiting--
-            if not waiting
-                sys.puts '>>> JS minified.'
-                minifyingJS = no
+minify = (file, callback) ->
+    develop.exec "java -jar contrib/closure.jar --js #{file}", callback
 
 ### Helpers ###
 
