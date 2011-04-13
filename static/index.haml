@@ -1,0 +1,24 @@
+%html
+  %head
+    %link( rel="stylesheet" type="text/css" href="/styles/main.css" )
+
+  %body
+
+    #apartments
+      %ul
+        %li.t
+          %h1.address
+            Apartment template
+
+      %form.new
+        %input( type="text" )
+
+    :javascript
+      (function() {
+      var js = document.createElement('script');
+      js.type = 'text/javascript'; js.async = true; js.src = '/scripts/main.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(js, s);
+      })();
+
+    
